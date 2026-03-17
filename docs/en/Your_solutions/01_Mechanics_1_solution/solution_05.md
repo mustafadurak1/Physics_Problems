@@ -1,91 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Mechanics I - Relative Velocity Visualization</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #f0f2f5; }
-        .controls { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: 20px; }
-        .data { margin-top: 10px; font-weight: bold; color: #1a73e8; }
-        canvas { border-radius: 8px; border: 2px solid #ddd; }
-    </style>
-</head>
-<body>
-    <h2>Problem 5: Boat Crossing a River</h2>
-    <div class="controls">
-        <label>River Speed (East): </label>
-        <input type="range" id="riverSpeed" min="0" max="4" step="0.1" value="2">
-        <br><br>
-        <label>Boat Speed (Still Water): </label>
-        <input type="range" id="boatSpeed" min="2.1" max="8" step="0.1" value="5">
-        <div class="data" id="stats"></div>
-    </div>
+# Mechanics I: Study Notes & Problem Solutions
+**Student:** Mustafa Duhan Durak  
+**Topic:** Kinematics, Dynamics, and Vector Calculus
 
-    <script>
-        let boatY = 350;
-        let angle;
-        let v_net;
+---
 
-        function setup() {
-            createCanvas(600, 400);
-        }
+## 1. Projectile Motion
+**Problem:** $v_0 = 100 \text{ m/s}$ at $\theta = 37^\circ$. (Assume $g = 9.8 \text{ m/s}^2$)
 
-        function draw() {
-            background(240);
-            
-            // Draw River
-            fill(173, 216, 230);
-            noStroke();
-            rect(0, 50, 600, 300);
-            
-            // Draw Banks
-            fill(139, 69, 19);
-            rect(0, 0, 600, 50);
-            rect(0, 350, 600, 50);
+### Differential Equations
+* **Horizontal ($x$):** $\frac{d^2x}{dt^2} = 0$
+* **Vertical ($y$):** $\frac{d^2y}{dt^2} = -9.8$
 
-            let v_r = parseFloat(document.getElementById('riverSpeed').value);
-            let v_b = parseFloat(document.getElementById('boatSpeed').value);
+### Results
+* **Time of Flight ($t_f$):** $\frac{2v_0 \sin\theta}{g} \approx \mathbf{12.24 \text{ s}}$
+* **Max Height ($H$):** $\frac{(v_0 \sin\theta)^2}{2g} \approx \mathbf{183.67 \text{ m}}$
+* **Range ($R$):** $\frac{v_0^2 \sin(2\theta)}{g} \approx \mathbf{980.88 \text{ m}}$
 
-            // Calculation
-            angle = asin(v_r / v_b);
-            v_net = v_b * cos(angle);
-            let angleDeg = (angle * 180 / PI).toFixed(1);
+---
 
-            document.getElementById('stats').innerHTML = 
-                `Heading Angle: ${angleDeg}° West of North <br> Resultant North Speed: ${v_net.toFixed(2)} m/s`;
+## 2. Range Optimization
+To find the maximum range $R(\theta) = \frac{v_0^2 \sin(2\theta)}{g}$:
+1. Differentiate with respect to $\theta$: $\frac{dR}{d\theta} = \frac{v_0^2}{g} [2\cos(2\theta)]$.
+2. Set to zero: $\cos(2\theta) = 0 \implies 2\theta = 90^\circ$.
+3. **Conclusion:** Maximum range is achieved at $\mathbf{\theta = 45^\circ}$.
 
-            // Draw Vector Diagram (Static Reference)
-            push();
-            translate(50, 300);
-            stroke(0); strokeWeight(2);
-            line(0,0, 0, -v_net * 20); // Resultant
-            stroke(255, 0, 0);
-            line(0,0, v_r * 20, 0); // River
-            stroke(0, 128, 0);
-            line(v_r * 20, 0, 0, -v_net * 20); // Boat Heading
-            pop();
+---
 
-            // Animate Boat
-            boatY -= (v_net / 2);
-            if (boatY < 50) boatY = 350;
+## 3. Path Intersection: Alice vs. Bob
+* **Alice:** $A(t) = (2+t, 8-3t)$
+* **Bob:** $B(t) = (2t-1, 2t+2)$
 
-            // Draw the Boat
-            push();
-            translate(300, boatY);
-            rotate(-angle);
-            fill(255, 100, 0);
-            stroke(0);
-            triangle(-10, 15, 10, 15, 0, -15); // Simple boat shape
-            pop();
-            
-            // Water Flow Lines
-            stroke(255, 255, 255, 150);
-            for(let i=0; i<5; i++) {
-                let y = 100 + i*50;
-                line((frameCount*v_r)%600, y, (frameCount*v_r)%600 + 30, y);
-            }
-        }
-    </script>
-</body>
-</html>
+**Analysis:**
+Setting $x_A = x_B \implies 2+t = 2t-1 \implies t = 3 \text{ s}$.  
+At $t=3$: $y_A = -1$ and $y_B = 8$.  
+**Result:** Since $y_A \neq y_B$, there is **no collision**.
+
+---
+
+## 4. Vector Calculus
+Given position $\vec{r}(t) = (3t^2)\hat{i} + (5t - 8t^2)\hat{j}$:
+* **Velocity:** $\vec{v}(t) = \frac{d\vec{r}}{dt} = \mathbf{6t\hat{i} + (5 - 16t)\hat{j}}$
+* **Acceleration:** $\vec{a}(t) = \frac{d\vec{v}}{dt} = \mathbf{6\hat{i} - 16\hat{j}}$
+
+---
+
+## 5. Relative Velocity (River Crossing)
+* **Heading Angle:** $\sin\theta = \frac{2}{5} \implies \theta = \arcsin(0.4) \approx \mathbf{23.58^\circ}$ (West of North).
+* **Crossing Velocity:** $v_{net} = \sqrt{5^2 - 2^2} = \sqrt{21} \approx \mathbf{4.58 \text{ m/s}}$.
+* **Time to Cross:** $t = \frac{200}{4.58} \approx \mathbf{43.67 \text{ s}}$.
+
+---
+
+## 6. Variable Velocity
+$v(t) = t^2 + 2t - 5$ with $x(0)=4$.
+* **Position:** $x(t) = \int v(t)dt = \frac{t^3}{3} + t^2 - 5t + 4$. At $t=3$, **$x = 7$**.
+* **Acceleration:** $a(t) = \frac{dv}{dt} = 2t + 2$. At $t=3$, **$a = 8 \text{ m/s}^2$**.
+
+---
+
+## 7. Trajectory Elimination
+Given $x = 2t^2$ and $y = 3t^3$:
+1. $t = \sqrt{x/2}$.
+2. Substitute into $y$: $y = 3(x/2)^{3/2} \implies \mathbf{27x^3 = 4y^2}$.
+3. **Acceleration:** $\vec{a}(t) = (4, 18t)$. (Not constant as it depends on $t$).
+
+---
+
+## 8. Circular Motion
+$\omega = \frac{2\pi}{86400} \text{ rad/s}$, $R = 6,378,000 \text{ m}$.
+* **Centripetal Acceleration:** $a_c = \omega^2 R \approx \mathbf{0.034 \text{ m/s}^2}$.
+
+---
+
+## 9. Momentum Comparison ($p = mv$)
+* **Fly:** $0.002 \text{ kg} \cdot 10 \text{ m/s} = 0.02 \text{ kg}\cdot\text{m/s}$.
+* **Tennis Ball:** $0.060 \text{ kg} \cdot 1 \text{ m/s} = 0.06 \text{ kg}\cdot\text{m/s}$.
+**Result:** The **tennis ball** has greater momentum.
+
+---
+
+## 10. Kinematics (3D Helix)
+$\vec{r}(t) = (a \cos\omega t, b \sin\omega t, bt)$
+* **Trajectory:** An **Elliptical Helix**.
+* **Path Length:** $s = \int_0^{t_0} \sqrt{(a\omega\sin\omega t)^2 + (b\omega\cos\omega t)^2 + b^2} \, dt$.
